@@ -29,7 +29,6 @@
       min-height: 100vh;
     }
 
-    /* ── SIDE BARS ── */
     body::before, body::after {
       content: '';
       position: fixed;
@@ -41,7 +40,6 @@
     body::before { left: 12px; }
     body::after  { right: 12px; }
 
-    /* ── NAV ── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -62,7 +60,6 @@
     }
     nav a:hover { color: var(--accent); }
 
-    /* ── HERO ── */
     #hero {
       min-height: 100vh;
       display: flex;
@@ -77,37 +74,38 @@
       content: '';
       position: absolute;
       inset: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 50% 60%, rgba(74,111,165,0.12) 0%, transparent 70%);
+      background: radial-gradient(ellipse 60% 50% at 50% 60%, rgba(74,111,165,0.12) 0%, transparent 70%);
       pointer-events: none;
     }
 
-    .logo-mark {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 1.5rem;
-      position: relative;
+    .hero-logo {
+      width: min(320px, 80vw);
+      margin-bottom: 1rem;
     }
-    /* Triangle logo SVG inline */
-    .logo-mark svg { width: 100%; height: 100%; }
+    .hero-logo img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
 
     .hero-name {
+      width: min(600px, 90vw);
+      margin-bottom: 1rem;
+    }
+    .hero-name img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* fallback text if images not set yet */
+    .hero-name-text {
       font-family: 'Bebas Neue', sans-serif;
       font-size: clamp(4rem, 15vw, 9rem);
       letter-spacing: 0.05em;
       color: var(--blue-light);
       line-height: 0.9;
-      text-shadow:
-        4px 4px 0 var(--blue-dim),
-        -2px -2px 0 rgba(74,111,165,0.3);
-      position: relative;
-    }
-    .hero-name::after {
-      content: attr(data-text);
-      position: absolute;
-      left: 4px; top: 4px;
-      color: var(--blue-dim);
-      z-index: -1;
+      text-shadow: 4px 4px 0 var(--blue-dim), -2px -2px 0 rgba(74,111,165,0.3);
     }
 
     .hero-sub {
@@ -115,7 +113,7 @@
       letter-spacing: 0.3em;
       text-transform: uppercase;
       color: var(--text-dim);
-      margin-top: 1rem;
+      margin-top: 0.5rem;
     }
 
     .scroll-hint {
@@ -133,7 +131,6 @@
       50% { opacity: 1; }
     }
 
-    /* ── SECTION COMMON ── */
     section {
       padding: 5rem 2rem;
       max-width: 960px;
@@ -158,18 +155,6 @@
       padding-bottom: 1rem;
     }
 
-    /* ── GALLERY ── */
-    /*
-      ▼▼▼ 作品を追加する方法 ▼▼▼
-      gallery-gridの中に以下を追加するだけ：
-
-      <div class="gallery-item">
-        <img src="images/your-image.jpg" alt="作品名" />
-        <div class="gallery-caption">作品名</div>
-      </div>
-
-      画像は index.html と同じフォルダに "images" フォルダを作って入れてください。
-    */
     .gallery-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -215,32 +200,24 @@
       transform: translateY(0);
     }
 
-    /* placeholder card */
-    .gallery-placeholder {
-      aspect-ratio: 1 / 1;
-      background: var(--bg2);
-      border: 1px dashed var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .gallery-empty {
+      grid-column: 1 / -1;
+      padding: 3rem;
+      text-align: center;
       color: var(--text-dim);
-      font-size: 0.6rem;
+      font-size: 0.7rem;
       letter-spacing: 0.15em;
-      text-transform: uppercase;
+      border: 1px dashed var(--border);
     }
 
-    /* ── ABOUT ── */
     .about-body {
       font-size: 0.8rem;
       line-height: 2;
       color: var(--text);
       max-width: 600px;
     }
-    .about-body strong {
-      color: var(--blue-light);
-    }
+    .about-body strong { color: var(--blue-light); }
 
-    /* ── CONTACT ── */
     .contact-list {
       list-style: none;
       display: flex;
@@ -276,7 +253,6 @@
       border-color: var(--accent);
     }
 
-    /* ── FOOTER ── */
     footer {
       text-align: center;
       padding: 3rem 2rem;
@@ -286,7 +262,6 @@
       border-top: 1px solid var(--border);
     }
 
-    /* ── LIGHTBOX ── */
     #lightbox {
       display: none;
       position: fixed;
@@ -314,7 +289,6 @@
     }
     #lightbox-close:hover { color: var(--accent); }
 
-    /* ── RESPONSIVE ── */
     @media (max-width: 600px) {
       nav { gap: 1rem; font-size: 0.6rem; padding: 0.75rem 1.5rem; }
       section { padding: 4rem 1.25rem; }
@@ -330,52 +304,30 @@
     <a href="#contact">Contact</a>
   </nav>
 
-  <!-- HERO -->
   <section id="hero">
-    <div class="logo-mark">
-      <svg viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="50,5 95,85 5,85" fill="#2e3a52" stroke="#4a6fa5" stroke-width="3"/>
-        <!-- eye -->
-        <ellipse cx="50" cy="52" rx="14" ry="10" fill="#1e2028" stroke="#4a6fa5" stroke-width="1.5"/>
-        <ellipse cx="50" cy="52" rx="6" ry="8" fill="#f0c040"/>
-        <ellipse cx="50" cy="52" rx="3" ry="5" fill="#1a1a1a"/>
-        <!-- X mark -->
-        <line x1="38" y1="68" x2="46" y2="76" stroke="#4a6fa5" stroke-width="2"/>
-        <line x1="46" y1="68" x2="38" y2="76" stroke="#4a6fa5" stroke-width="2"/>
-        <line x1="54" y1="68" x2="62" y2="76" stroke="#4a6fa5" stroke-width="2"/>
-        <line x1="62" y1="68" x2="54" y2="76" stroke="#4a6fa5" stroke-width="2"/>
-      </svg>
+    <!-- 三角ロゴ画像：images/logo-mark.png に置き換えてください -->
+    <div class="hero-logo">
+      <img src="images/logo-mark.png" alt="3KaK logo mark"
+           onerror="this.style.display='none'" />
     </div>
-    <h1 class="hero-name" data-text="3KaK">3KaK</h1>
+    <!-- 3KaK文字ロゴ画像：images/logo-text.png に置き換えてください -->
+    <div class="hero-name">
+      <img src="images/logo-text.png" alt="3KaK"
+           onerror="this.style.display='none'; document.getElementById('hero-fallback').style.display='block'" />
+    </div>
+    <h1 class="hero-name-text" id="hero-fallback" style="display:none">3KaK</h1>
     <p class="hero-sub">Graffiti × Japanese Aesthetics × Tribal</p>
     <span class="scroll-hint">▼ scroll</span>
   </section>
 
-  <!-- GALLERY -->
   <section id="gallery">
     <p class="section-label">// portfolio</p>
     <h2 class="section-title">Works</h2>
-    <div class="gallery-grid">
-
-      <!--
-        ▼▼▼ ここに作品を追加してください ▼▼▼
-        コピーして画像パスと作品名を変えるだけでOKです
-
-        <div class="gallery-item">
-          <img src="images/sample.jpg" alt="作品名" loading="lazy" />
-          <div class="gallery-caption">作品名</div>
-        </div>
-      -->
-
-      <!-- サンプル：実際の画像ファイルに差し替えてください -->
-      <div class="gallery-placeholder">+ Add Work</div>
-      <div class="gallery-placeholder">+ Add Work</div>
-      <div class="gallery-placeholder">+ Add Work</div>
-
+    <div class="gallery-grid" id="gallery-grid">
+      <div class="gallery-empty">Loading works...</div>
     </div>
   </section>
 
-  <!-- ABOUT -->
   <section id="about">
     <p class="section-label">// profile</p>
     <h2 class="section-title">About</h2>
@@ -389,7 +341,6 @@
     </div>
   </section>
 
-  <!-- CONTACT -->
   <section id="contact">
     <p class="section-label">// contact</p>
     <h2 class="section-title">Contact</h2>
@@ -406,28 +357,51 @@
   </section>
 
   <footer>
-    &copy; 2024 3KaK — All rights reserved.
+    &copy; 2025 3KaK — All rights reserved.
   </footer>
 
-  <!-- LIGHTBOX -->
   <div id="lightbox">
     <button id="lightbox-close">✕</button>
     <img id="lightbox-img" src="" alt="" />
   </div>
 
   <script>
+    // ギャラリー読み込み
+    async function loadGallery() {
+      const grid = document.getElementById('gallery-grid');
+      try {
+        const res = await fetch('images/images.json');
+        if (!res.ok) throw new Error('not found');
+        const files = await res.json();
+        if (!files.length) throw new Error('empty');
+
+        grid.innerHTML = '';
+        files.forEach(filename => {
+          const name = filename.replace(/\.[^.]+$/, '');
+          const item = document.createElement('div');
+          item.className = 'gallery-item';
+          item.innerHTML = `
+            <img src="images/${filename}" alt="${name}" loading="lazy" />
+            <div class="gallery-caption">${name}</div>
+          `;
+          item.querySelector('img').addEventListener('click', () => openLightbox(`images/${filename}`, name));
+          grid.appendChild(item);
+        });
+      } catch {
+        grid.innerHTML = '<div class="gallery-empty">// works coming soon</div>';
+      }
+    }
+
     // Lightbox
     const lightbox = document.getElementById('lightbox');
     const lbImg    = document.getElementById('lightbox-img');
     const lbClose  = document.getElementById('lightbox-close');
 
-    document.querySelectorAll('.gallery-item img').forEach(img => {
-      img.addEventListener('click', () => {
-        lbImg.src = img.src;
-        lbImg.alt = img.alt;
-        lightbox.classList.add('open');
-      });
-    });
+    function openLightbox(src, alt) {
+      lbImg.src = src;
+      lbImg.alt = alt;
+      lightbox.classList.add('open');
+    }
 
     lbClose.addEventListener('click', () => lightbox.classList.remove('open'));
     lightbox.addEventListener('click', e => {
@@ -436,6 +410,8 @@
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') lightbox.classList.remove('open');
     });
+
+    loadGallery();
   </script>
 
 </body>
