@@ -213,6 +213,7 @@
       line-height: 2;
       color: var(--text);
       max-width: 600px;
+      margin: 0 auto;
     }
     .about-body strong { color: var(--blue-light); }
 
@@ -221,13 +222,13 @@
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
+      align-items: center;
     }
 
     .contact-list li {
       display: flex;
       align-items: center;
       gap: 1rem;
-      align-items: center;
     }
 
     .contact-icon {
@@ -306,6 +307,7 @@
     <a href="#gallery">Gallery</a>
   </nav>
 
+  <!-- HERO -->
   <section id="hero">
     <div class="hero-logo">
       <img src="images/logo-mark.png" alt="3KaK logo mark" onerror="this.style.display='none'" />
@@ -318,14 +320,31 @@
     <span class="scroll-hint">▼ scroll</span>
   </section>
 
-  <div id="gallery">
-    <p class="section-label">// portfolio</p>
-    <h2 class="section-title">Gallery</h2>
-    <div id="gallery-container">
-      <div class="gallery-empty">Loading works...</div>
-    </div>
-  </div>
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="section-label">// contact</p>
+    <h2 class="section-title">Contact</h2>
+    <ul class="contact-list">
+      <li>
+        <span class="contact-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 2-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/>
+          </svg>
+        </span>
+        <a class="contact-link" href="mailto:3kako0@gmail.com">3kako0@gmail.com</a>
+      </li>
+      <li>
+        <span class="contact-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </span>
+        <a class="contact-link" href="https://x.com/_3kak_" target="_blank" rel="noopener">@_3kak_</a>
+      </li>
+    </ul>
+  </section>
 
+  <!-- ABOUT -->
   <section id="about">
     <p class="section-label">// profile</p>
     <h2 class="section-title">About</h2>
@@ -340,30 +359,14 @@
     </div>
   </section>
 
-  <section id="contact">
-    <p class="section-label">// contact</p>
-    <h2 class="section-title">Contact</h2>
-    <ul class="contact-list">
-      <li>
-        <span class="contact-icon">
-          <!-- Mail icon -->
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 2-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/>
-          </svg>
-        </span>
-        <a class="contact-link" href="mailto:3kako0@gmail.com">3kako0@gmail.com</a>
-      </li>
-      <li>
-        <span class="contact-icon">
-          <!-- X (Twitter) icon -->
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-          </svg>
-        </span>
-        <a class="contact-link" href="https://x.com/_3kak_" target="_blank" rel="noopener">@_3kak_</a>
-      </li>
-    </ul>
-  </section>
+  <!-- GALLERY -->
+  <div id="gallery">
+    <p class="section-label">// portfolio</p>
+    <h2 class="section-title">Gallery</h2>
+    <div id="gallery-container">
+      <div class="gallery-empty">Loading works...</div>
+    </div>
+  </div>
 
   <footer>
     &copy; 2025 3KaK — All rights reserved.
@@ -487,5 +490,5 @@
     loadGallery();
   </script>
 
-<body onload="window.scrollTo(0,0)">
+</body>
 </html>
