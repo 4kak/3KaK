@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja" style="scroll-behavior: auto;">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -296,12 +295,10 @@
   <!-- HERO -->
   <section id="hero">
     <div class="hero-logo">
-      <img src="images/logo-mark.png"
-" alt="3KaK logo mark" onerror="this.style.display='none'" />
+      <img src="images/logo-mark.png" alt="3KaK logo mark" onerror="this.style.display='none'" />
     </div>
     <div class="hero-name">
-      <img src="images/logo-text.png"
-" alt="3KaK" onerror="this.style.display='none'; document.getElementById('hero-fallback').style.display='block'" />
+      <img src="images/logo-text.png" alt="3KaK" onerror="this.style.display='none'; document.getElementById('hero-fallback').style.display='block'" />
     </div>
     <h1 class="hero-name-text" id="hero-fallback" style="display:none">3KaK</h1>
     <p class="hero-sub">Graffiti × Logo × Motif</p>
@@ -378,20 +375,21 @@
 
         const boardW = board.offsetWidth || window.innerWidth - 48;
         const isMobile = boardW < 500;
+        // ステッカーを小さめにして密度を上げる
         const stickerW = isMobile
-          ? Math.floor(boardW * 0.42)
-          : Math.floor(boardW * 0.28);
+          ? Math.floor(boardW * 0.52)
+          : Math.floor(boardW * 0.38);
 
-        // グリッドベースにランダムオフセットで散らばらせる
+        // セルを小さくして重なりを増やす
         const cols = isMobile ? 2 : 3;
         const rows = Math.ceil(files.length / cols);
         const cellW = boardW / cols;
-        const cellH = stickerW * 1.2;
-        const totalH = rows * cellH + stickerW * 0.6;
+        const cellH = stickerW * 0.7; // 重なりを増やすため小さく
+        const totalH = rows * cellH + stickerW * 1.2;
         board.style.minHeight = totalH + 'px';
 
-        const rand = makeRand(7);
-        const rotSet = [-14, -10, -7, -4, -2, 2, 4, 7, 10, 14];
+        const rand = makeRand(13);
+        const rotSet = [-25, -18, -12, -8, -5, -2, 2, 5, 8, 12, 18, 25];
 
         // zIndexをシャッフル
         const zArr = files.map((_, i) => i + 1);
@@ -404,14 +402,15 @@
           const col = i % cols;
           const row = Math.floor(i / cols);
 
-          const baseX = col * cellW + (cellW - stickerW) / 2;
+          const baseX = col * cellW;
           const baseY = row * cellH;
-          const ox = (rand() - 0.5) * cellW * 0.45;
-          const oy = (rand() - 0.5) * cellH * 0.3;
+          // オフセットを大きくしてよりランダムに
+          const ox = (rand() - 0.5) * cellW * 0.8;
+          const oy = (rand() - 0.5) * cellH * 0.8;
           const rot = rotSet[Math.floor(rand() * rotSet.length)];
           const z = zArr[i];
 
-          const x = Math.max(0, Math.min(boardW - stickerW, baseX + ox));
+          const x = Math.max(-stickerW * 0.1, Math.min(boardW - stickerW * 0.9, baseX + ox));
           const y = Math.max(0, baseY + oy);
 
           const el = document.createElement('div');
