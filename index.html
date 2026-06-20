@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" style="scroll-behavior: auto;">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -283,7 +284,8 @@
     }
   </style>
 </head>
-<body>
+<body onload="window.scrollTo(0,0)">
+
 
   <nav>
     <a href="#gallery">Gallery</a>
@@ -470,7 +472,6 @@
       if (e.key === 'Escape') lightbox.classList.remove('open');
     });
 
-    window.scrollTo(0, 0);
     loadGallery();
   </script>
 
