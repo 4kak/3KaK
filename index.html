@@ -480,12 +480,12 @@
             <div class="slider-track" id="slider-track">
               ${files.map(f => `
                 <div class="slider-slide">
-                  <img src="images/${f}" alt="${f.replace(/\.[^.]+$/, '').replace(/_/g, ' ')}" loading="lazy" class="loading" onload="this.classList.remove('loading')" />
+                  <img src="images/${f}" alt="${f.replace(/\.[^.]+$/, '').replace('works/', '').replace(/_/g, ' ')}" loading="lazy" class="loading" onload="this.classList.remove('loading')" />
                 </div>
               `).join('')}
             </div>
           </div>
-          <div class="slide-title" id="slide-title">${files[0].replace(/\.[^.]+$/, '').replace(/_/g, ' ')}</div>
+          <div class="slide-title" id="slide-title">${files[0].replace(/\.[^.]+$/, '').replace('works/', '').replace(/_/g, ' ')}</div>
           <div class="slider-dots" id="slider-dots">
             ${files.map((_, i) => `<div class="slider-dot${i === 0 ? ' active' : ''}" data-i="${i}"></div>`).join('')}
           </div>
@@ -516,7 +516,7 @@
       });
       document.getElementById('slider-counter').textContent = `${currentIndex + 1} / ${files.length}`;
       // タイトル更新
-      const title = files[currentIndex].replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+      const title = files[currentIndex].replace(/\.[^.]+$/, '').replace('works/', '').replace(/_/g, ' ');
       document.getElementById('slide-title').textContent = title;
     }
 
