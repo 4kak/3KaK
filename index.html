@@ -480,7 +480,7 @@
             <div class="slider-track" id="slider-track">
               ${files.map(f => `
                 <div class="slider-slide">
-                  <img src="${f}" alt="${f.replace(/\.[^.]+$/, '').replace(/_/g, ' ')}" loading="lazy" class="loading" onload="this.classList.remove('loading')" />
+                  <img src="images/${f}" alt="${f.replace(/\.[^.]+$/, '').replace(/_/g, ' ')}" loading="lazy" class="loading" onload="this.classList.remove('loading')" />
                 </div>
               `).join('')}
             </div>
@@ -493,7 +493,7 @@
         `;
 
         document.querySelectorAll('.slider-slide img').forEach((img, i) => {
-          img.addEventListener('click', () => openLightbox(files[i], img.alt));
+          img.addEventListener('click', () => openLightbox('images/' + files[i], img.alt));
         });
 
         document.querySelectorAll('.slider-dot').forEach(dot => {
