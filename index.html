@@ -425,7 +425,7 @@
     }
 
     function goTo(index) {
-      currentIndex = Math.max(0, Math.min(files.length - 1, index));
+      currentIndex = ((index % files.length) + files.length) % files.length;
       const track = document.getElementById('slider-track');
       track.style.transform = `translateX(-${currentIndex * 100}%)`;
       document.querySelectorAll('.slider-dot').forEach((d, i) => {
