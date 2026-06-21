@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3KaK</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <meta property="og:title" content="3KaK" />
+  <meta property="og:description" content="Graffiti × Logo × sticker" />
+  <meta property="og:image" content="https://4kak.github.io/3KaK/ogp.png" />
+  <meta property="og:url" content="https://4kak.github.io/3KaK/" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -40,6 +46,41 @@
     }
     body::before { left: 12px; }
     body::after  { right: 12px; }
+
+    /* ── LOADING ── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      transition: opacity 0.5s ease;
+    }
+    #loading.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .loading-logo img { width: 100%; height: auto; }
+    @keyframes pulse {
+      0%,100% { opacity: 0.4; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+    .loading-text {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      animation: blink 1.2s ease-in-out infinite;
+    }
 
     nav {
       position: fixed;
@@ -144,7 +185,7 @@
       position: relative;
       width: 100%;
       overflow: hidden;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       cursor: grab;
     }
     .slider-wrap:active { cursor: grabbing; }
@@ -161,6 +202,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
     .slider-slide img {
       display: block;
@@ -170,13 +212,28 @@
       cursor: pointer;
       object-fit: contain;
       object-position: center;
+      transition: opacity 0.3s ease;
+    }
+    .slider-slide img.loading {
+      opacity: 0;
+    }
+
+    /* 作品タイトル */
+    .slide-title {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 1rem;
+      min-height: 1.2em;
+      transition: opacity 0.3s ease;
     }
 
     .slider-dots {
       display: flex;
       justify-content: center;
       gap: 0.5rem;
-      margin-bottom: 4rem;
+      margin-bottom: 1rem;
     }
 
     .slider-dot {
@@ -197,7 +254,6 @@
       font-size: 0.6rem;
       letter-spacing: 0.2em;
       color: var(--text-dim);
-      margin-top: -3rem;
       margin-bottom: 4rem;
     }
 
@@ -307,7 +363,15 @@
     }
   </style>
 </head>
-<body onload="window.scrollTo(0,0)">
+<body onload="init()">
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="loading-logo">
+      <img src="images/logo-mark.png" alt="" onerror="this.style.display='none'" />
+    </div>
+    <div class="loading-text">Loading...</div>
+  </div>
 
   <nav>
     <a href="#gallery">Gallery</a>
@@ -318,9 +382,9 @@
   <!-- HERO -->
   <section id="hero">
     <div class="hero-logo">
-       <a href="https://3kak.booth.pm" target="_blank" rel="noopener">
-      <img src="images/logo-mark.png" alt="3KaK logo mark" onerror="this.style.display='none'" />
-       </a>
+      <a href="https://3kak.booth.pm" target="_blank" rel="noopener">
+        <img src="images/logo-mark.png" alt="3KaK logo mark" onerror="this.style.display='none'" />
+      </a>
     </div>
     <div class="hero-name">
       <img src="images/logo-text.png" alt="3KaK" onerror="this.style.display='none'; document.getElementById('hero-fallback').style.display='block'" />
@@ -391,6 +455,18 @@
     let currentIndex = 0;
     let files = [];
 
+    function hideLoading() {
+      const el = document.getElementById('loading');
+      el.classList.add('hide');
+      setTimeout(() => el.remove(), 600);
+    }
+
+    async function init() {
+      window.scrollTo(0, 0);
+      await loadGallery();
+      setTimeout(hideLoading, 800);
+    }
+
     async function loadGallery() {
       const container = document.getElementById('gallery-container');
       try {
@@ -404,11 +480,12 @@
             <div class="slider-track" id="slider-track">
               ${files.map(f => `
                 <div class="slider-slide">
-                  <img src="${f}" alt="${f.replace(/\.[^.]+$/, '')}" loading="lazy" />
+                  <img src="${f}" alt="${f.replace(/\.[^.]+$/, '').replace(/_/g, ' ')}" loading="lazy" class="loading" onload="this.classList.remove('loading')" />
                 </div>
               `).join('')}
             </div>
           </div>
+          <div class="slide-title" id="slide-title">${files[0].replace(/\.[^.]+$/, '').replace(/_/g, ' ')}</div>
           <div class="slider-dots" id="slider-dots">
             ${files.map((_, i) => `<div class="slider-dot${i === 0 ? ' active' : ''}" data-i="${i}"></div>`).join('')}
           </div>
@@ -438,6 +515,9 @@
         d.classList.toggle('active', i === currentIndex);
       });
       document.getElementById('slider-counter').textContent = `${currentIndex + 1} / ${files.length}`;
+      // タイトル更新
+      const title = files[currentIndex].replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+      document.getElementById('slide-title').textContent = title;
     }
 
     function initSwipe() {
@@ -496,10 +576,7 @@
       if (e.key === 'ArrowRight') goTo(currentIndex + 1);
       if (e.key === 'ArrowLeft') goTo(currentIndex - 1);
     });
-
-    loadGallery();
   </script>
 
 <body onload="window.scrollTo(0,0)">
 </html>
-
