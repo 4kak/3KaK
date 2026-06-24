@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POMO</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+JP:wght@300;500&display=swap');
+
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --sub: #666;
+    --radius: 2px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+    transition: filter 0.5s ease;
+  }
+  body.greyscale { filter: grayscale(1) brightness(0.85); }
+
+  /* ── Nav ── */
+  .nav {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 28px;
+    background: var(--surface);
+    padding: 3px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .nav-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 7px 16px;
+    border: none;
+    background: transparent;
+    color: var(--sub);
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .nav-btn.active { background: var(--text); color: var(--bg); }
+
+  /* ── Pages ── */
+  .page { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 340px; }
+  .page.active { display: flex; }
+
+  /* ── Mode tabs ── */
+  .mode-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 28px;
+    background: var(--surface);
+    padding: 3px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .mode-tab {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 7px 18px;
+    border: none;
+    background: transparent;
+    color: var(--sub);
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .mode-tab.active { background: var(--text); color: var(--bg); }
+
+  /* ── Timer ring ── */
+  .timer-wrap { position: relative; margin-bottom: 28px; }
+  .timer-ring { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 2; }
+  .ring-progress {
+    fill: none; stroke: var(--text); stroke-width: 2; stroke-linecap: butt;
+    transition: stroke-dashoffset 1s linear, stroke 0.5s;
+  }
+  .timer-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); text-align: center;
+  }
+  .timer-display {
+    font-family: 'Space Mono', monospace;
+    font-size: 52px; font-weight: 700; letter-spacing: -2px; line-height: 1;
+  }
+  .timer-label {
+    font-size: 10px; letter-spacing: 3px; color: var(--sub);
+    margin-top: 6px; text-transform: uppercase;
+  }
+
+  /* ── Controls ── */
+  .controls { display: flex; gap: 12px; margin-bottom: 28px; align-items: center; }
+  .btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px; letter-spacing: 2px; padding: 10px 24px;
+    border: 1px solid var(--border); background: transparent; color: var(--text);
+    cursor: pointer; border-radius: var(--radius); text-transform: uppercase; transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--text); }
+  .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .btn.primary:hover { opacity: 0.85; }
+  .btn.small { padding: 8px 14px; font-size: 9px; }
+
+  /* ── Session dots ── */
+  .sessions { display: flex; gap: 6px; margin-bottom: 28px; }
+  .session-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    border: 1px solid var(--border); background: transparent; transition: background 0.3s;
+  }
+  .session-dot.done { background: var(--text); border-color: var(--text); }
+
+  /* ── Settings ── */
+  .settings {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; width: 100%; margin-bottom: 20px;
+  }
+  .setting-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px;
+  }
+  .setting-label {
+    font-size: 9px; letter-spacing: 2px; color: var(--sub);
+    text-transform: uppercase; margin-bottom: 6px; font-family: 'Space Mono', monospace;
+  }
+  .setting-row { display: flex; align-items: center; gap: 8px; }
+  .setting-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px; font-weight: 700; min-width: 28px; text-align: center;
+  }
+  .adj-btn {
+    width: 22px; height: 22px; border: 1px solid var(--border);
+    background: transparent; color: var(--text); cursor: pointer;
+    border-radius: var(--radius); font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s; flex-shrink: 0;
+  }
+  .adj-btn:hover { border-color: var(--text); }
+
+  /* ── Music ── */
+  .music-section {
+    width: 100%; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;
+    margin-bottom: 16px;
+  }
+  .section-header {
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    letter-spacing: 3px; color: var(--sub); text-transform: uppercase; margin-bottom: 12px;
+  }
+  .music-drop {
+    border: 1px dashed var(--border); border-radius: var(--radius);
+    padding: 16px; text-align: center; cursor: pointer;
+    transition: border-color 0.2s; margin-bottom: 12px; position: relative;
+  }
+  .music-drop:hover { border-color: var(--sub); }
+  .music-drop input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .drop-text { font-size: 11px; color: var(--sub); letter-spacing: 1px; }
+  .track-info {
+    font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text);
+    margin-bottom: 10px; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; min-height: 14px;
+  }
+  .music-controls { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+  .m-btn {
+    width: 30px; height: 30px; border: 1px solid var(--border);
+    background: transparent; color: var(--text); cursor: pointer;
+    border-radius: var(--radius); display: flex; align-items: center; justify-content: center;
+    font-size: 12px; transition: border-color 0.15s; flex-shrink: 0;
+  }
+  .m-btn:hover { border-color: var(--text); }
+  .progress-wrap { flex: 1; height: 2px; background: var(--border); cursor: pointer; position: relative; }
+  .progress-bar { height: 100%; background: var(--text); width: 0%; transition: width 0.5s linear; pointer-events: none; }
+  .volume-row { display: flex; align-items: center; gap: 8px; }
+  .vol-icon { font-size: 11px; color: var(--sub); }
+  input[type="range"] {
+    -webkit-appearance: none; flex: 1; height: 2px;
+    background: var(--border); outline: none; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--text);
+  }
+
+  /* ── Grey toggle ── */
+  .grey-toggle {
+    margin-top: 4px; display: flex; align-items: center; gap: 10px;
+    font-size: 10px; letter-spacing: 2px; color: var(--sub);
+    text-transform: uppercase; font-family: 'Space Mono', monospace;
+    cursor: pointer; user-select: none;
+  }
+  .toggle-switch {
+    width: 32px; height: 16px; background: var(--border);
+    border-radius: 8px; position: relative; transition: background 0.2s; flex-shrink: 0;
+  }
+  .toggle-switch.on { background: var(--text); }
+  .toggle-knob {
+    position: absolute; width: 12px; height: 12px; background: var(--bg);
+    border-radius: 50%; top: 2px; left: 2px; transition: left 0.2s;
+  }
+  .toggle-switch.on .toggle-knob { left: 18px; }
+
+  /* ── Memo ── */
+  .memo-section { width: 100%; margin-bottom: 16px; }
+  .memo-input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px; color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
+    resize: none; outline: none; transition: border-color 0.2s;
+  }
+  .memo-input::placeholder { color: var(--sub); }
+  .memo-input:focus { border-color: var(--sub); }
+  .memo-save {
+    margin-top: 8px; width: 100%;
+    font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px;
+    padding: 9px; border: 1px solid var(--border); background: transparent;
+    color: var(--sub); cursor: pointer; border-radius: var(--radius);
+    text-transform: uppercase; transition: all 0.15s;
+  }
+  .memo-save:hover { border-color: var(--text); color: var(--text); }
+
+  /* ── Log page ── */
+  .log-header {
+    width: 100%; display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 20px;
+  }
+  .log-title {
+    font-family: 'Space Mono', monospace; font-size: 9px;
+    letter-spacing: 3px; color: var(--sub); text-transform: uppercase;
+  }
+  .log-clear {
+    font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px;
+    padding: 5px 10px; border: 1px solid var(--border); background: transparent;
+    color: var(--sub); cursor: pointer; border-radius: var(--radius); text-transform: uppercase;
+  }
+  .log-clear:hover { border-color: var(--danger, #888); color: var(--danger, #888); }
+
+  /* ── Week graph ── */
+  .week-graph { width: 100%; margin-bottom: 24px; }
+  .graph-bars {
+    display: flex; gap: 6px; align-items: flex-end;
+    height: 80px; margin-bottom: 6px;
+  }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar-bg {
+    width: 100%; flex: 1; background: var(--surface);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    position: relative; overflow: hidden; min-height: 60px;
+  }
+  .bar-fill {
+    position: absolute; bottom: 0; width: 100%; background: var(--text);
+    transition: height 0.4s ease;
+  }
+  .bar-label {
+    font-family: 'Space Mono', monospace; font-size: 8px;
+    color: var(--sub); letter-spacing: 1px;
+  }
+  .bar-val {
+    font-family: 'Space Mono', monospace; font-size: 8px; color: var(--sub);
+  }
+
+  /* ── Log entries ── */
+  .log-entries { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+  .log-day {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px;
+  }
+  .log-day-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .log-day-date {
+    font-family: 'Space Mono', monospace; font-size: 10px; color: var(--text);
+    letter-spacing: 1px;
+  }
+  .log-day-stats {
+    font-family: 'Space Mono', monospace; font-size: 9px; color: var(--sub);
+    letter-spacing: 1px;
+  }
+  .log-memo-list { display: flex; flex-direction: column; gap: 4px; }
+  .log-memo-item {
+    font-size: 11px; color: var(--sub); padding-left: 10px;
+    border-left: 1px solid var(--border); line-height: 1.5;
+  }
+  .log-empty {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    color: var(--sub); letter-spacing: 2px; text-align: center;
+    padding: 40px 0;
+  }
+
+  /* ── Notification ── */
+  .notif {
+    position: fixed; top: 20px; left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: var(--text); color: var(--bg);
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    letter-spacing: 2px; padding: 12px 24px;
+    border-radius: var(--radius); transition: transform 0.3s ease;
+    z-index: 100; text-transform: uppercase; white-space: nowrap;
+  }
+  .notif.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<!-- Nav -->
+<div class="nav" style="margin-top:8px;">
+  <button class="nav-btn active" onclick="showPage('timer')">Timer</button>
+  <button class="nav-btn" onclick="showPage('log')">Log</button>
+</div>
+
+<!-- ── Timer Page ── -->
+<div class="page active" id="page-timer">
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tab-work" onclick="switchMode('work')">Work</button>
+    <button class="mode-tab" id="tab-break" onclick="switchMode('break')">Break</button>
+  </div>
+
+  <div class="timer-wrap">
+    <svg class="timer-ring" width="200" height="200" viewBox="0 0 200 200">
+      <circle class="ring-bg" cx="100" cy="100" r="90"/>
+      <circle class="ring-progress" id="ring" cx="100" cy="100" r="90"
+        stroke-dasharray="565.5" stroke-dashoffset="0"/>
+    </svg>
+    <div class="timer-center">
+      <div class="timer-display" id="timerDisplay">45:00</div>
+      <div class="timer-label" id="timerLabel">集中</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn small" onclick="resetTimer()">Reset</button>
+    <button class="btn primary" id="startBtn" onclick="toggleTimer()">Start</button>
+    <button class="btn small" onclick="skipPhase()">Skip</button>
+  </div>
+
+  <div class="sessions" id="sessionDots"></div>
+
+  <div class="settings">
+    <div class="setting-item">
+      <div class="setting-label">Work (min)</div>
+      <div class="setting-row">
+        <button class="adj-btn" onclick="adjustTime('work',-5)">−</button>
+        <div class="setting-val" id="workVal">45</div>
+        <button class="adj-btn" onclick="adjustTime('work',5)">＋</button>
+      </div>
+    </div>
+    <div class="setting-item">
+      <div class="setting-label">Break (min)</div>
+      <div class="setting-row">
+        <button class="adj-btn" onclick="adjustTime('break',-5)">−</button>
+        <div class="setting-val" id="breakVal">10</div>
+        <button class="adj-btn" onclick="adjustTime('break',5)">＋</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Memo -->
+  <div class="memo-section">
+    <div class="section-header" style="margin-bottom:8px;">今日のメモ</div>
+    <textarea class="memo-input" id="memoInput" rows="2" placeholder="何を描いてる？"></textarea>
+    <button class="memo-save" onclick="saveMemo()">保存</button>
+  </div>
+
+  <!-- Music -->
+  <div class="music-section">
+    <div class="section-header">Music</div>
+    <div class="music-drop">
+      <input type="file" id="fileInput" accept="audio/*" multiple onchange="loadFiles(event)">
+      <div class="drop-text">音源ファイルをここに</div>
+    </div>
+    <div class="track-info" id="trackInfo">—</div>
+    <div class="music-controls">
+      <button class="m-btn" onclick="prevTrack()">◀</button>
+      <button class="m-btn" id="playBtn" onclick="togglePlay()">▶</button>
+      <button class="m-btn" onclick="nextTrack()">▶▶</button>
+      <div class="progress-wrap" onclick="seekAudio(event)">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+    <div class="volume-row">
+      <span class="vol-icon">♪</span>
+      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.8" oninput="setVolume(this.value)">
+    </div>
+  </div>
+
+  <label class="grey-toggle" onclick="toggleGrey()">
+    <div class="toggle-switch" id="greySwitch"><div class="toggle-knob"></div></div>
+    Greyscale
+  </label>
+</div>
+
+<!-- ── Log Page ── -->
+<div class="page" id="page-log">
+  <div class="log-header">
+    <div class="log-title">Weekly Log</div>
+    <button class="log-clear" onclick="clearLog()">Clear all</button>
+  </div>
+  <div class="week-graph" id="weekGraph"></div>
+  <div class="log-entries" id="logEntries"></div>
+</div>
+
+<audio id="audioPlayer"></audio>
+
+<script>
+// ── Storage key ──
+const STORAGE_KEY = 'pomo_log_v1';
+
+// ── State ──
+let workMin = 45, breakMin = 10;
+let currentMode = 'work';
+let totalSec, remainSec;
+let running = false;
+let interval = null;
+let sessionCount = 0;
+let maxSessions = 4;
+let greyEnabled = false;
+let currentPage = 'timer';
+
+// ── Page nav ──
+function showPage(p) {
+  currentPage = p;
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+  document.querySelectorAll('.nav-btn')[p === 'timer' ? 0 : 1].classList.add('active');
+  if (p === 'log') renderLog();
+}
+
+// ── Audio ──
+const audio = document.getElementById('audioPlayer');
+let tracks = [], currentTrack = 0;
+
+function loadFiles(e) {
+  tracks = Array.from(e.target.files).map(f => ({ name: f.name, url: URL.createObjectURL(f) }));
+  currentTrack = 0;
+  loadTrack(0);
+}
+function loadTrack(i) {
+  if (!tracks.length) return;
+  audio.src = tracks[i].url;
+  audio.volume = parseFloat(document.getElementById('volumeSlider').value);
+  document.getElementById('trackInfo').textContent = tracks[i].name.replace(/\.[^/.]+$/, '');
+}
+function togglePlay() {
+  if (!tracks.length) return;
+  if (audio.paused) { audio.play(); document.getElementById('playBtn').textContent = '⏸'; }
+  else { audio.pause(); document.getElementById('playBtn').textContent = '▶'; }
+}
+function prevTrack() {
+  if (!tracks.length) return;
+  currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
+  loadTrack(currentTrack); audio.play();
+}
+function nextTrack() {
+  if (!tracks.length) return;
+  currentTrack = (currentTrack + 1) % tracks.length;
+  loadTrack(currentTrack); audio.play();
+}
+function setVolume(v) { audio.volume = v; }
+function seekAudio(e) {
+  if (!audio.duration) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+}
+audio.addEventListener('ended', () => { nextTrack(); audio.play(); });
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration) return;
+  document.getElementById('progressBar').style.width = (audio.currentTime / audio.duration * 100) + '%';
+});
+
+// ── Alert sound (Web Audio API) ──
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playBeep(type) {
+  // type: 'start' = low single, 'end' = high double
+  try {
+    const ctx = getAudioCtx();
+    const freqs = type === 'end' ? [880, 1100] : [440];
+    freqs.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const t = ctx.currentTime + i * 0.22;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.02);
+      gain.gain.linearRampToValueAtTime(0, t + 0.18);
+      osc.start(t); osc.stop(t + 0.2);
+    });
+  } catch(e) {}
+}
+
+// ── Timer ──
+function initTimer() {
+  totalSec = (currentMode === 'work' ? workMin : breakMin) * 60;
+  remainSec = totalSec;
+  updateDisplay(); updateRing();
+}
+function toggleTimer() {
+  if (running) pauseTimer(); else startTimer();
+}
+function startTimer() {
+  running = true;
+  document.getElementById('startBtn').textContent = 'Pause';
+  playBeep('start');
+  interval = setInterval(tick, 1000);
+}
+function pauseTimer() {
+  running = false;
+  document.getElementById('startBtn').textContent = 'Start';
+  clearInterval(interval);
+}
+function tick() {
+  remainSec--;
+  updateDisplay(); updateRing();
+  if (remainSec <= 0) phaseEnd();
+}
+function phaseEnd() {
+  pauseTimer();
+  playBeep('end');
+  if (currentMode === 'work') {
+    sessionCount++;
+    saveSession();
+    updateDots();
+    showNotif('休憩タイム！');
+    switchMode('break');
+  } else {
+    showNotif('集中スタート！');
+    switchMode('work');
+  }
+  startTimer();
+}
+function resetTimer() {
+  pauseTimer();
+  document.getElementById('startBtn').textContent = 'Start';
+  initTimer();
+}
+function skipPhase() {
+  pauseTimer();
+  document.getElementById('startBtn').textContent = 'Start';
+  if (currentMode === 'work') { sessionCount++; saveSession(); updateDots(); switchMode('break'); }
+  else switchMode('work');
+}
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('tab-work').classList.toggle('active', mode === 'work');
+  document.getElementById('tab-break').classList.toggle('active', mode === 'break');
+  document.getElementById('timerLabel').textContent = mode === 'work' ? '集中' : '休憩';
+  document.getElementById('ring').style.stroke = mode === 'work' ? 'var(--text)' : '#555';
+  initTimer();
+}
+function updateDisplay() {
+  const m = String(Math.floor(remainSec / 60)).padStart(2, '0');
+  const s = String(remainSec % 60).padStart(2, '0');
+  document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+}
+function updateRing() {
+  document.getElementById('ring').style.strokeDashoffset = 565.5 * (1 - remainSec / totalSec);
+}
+function adjustTime(type, delta) {
+  if (type === 'work') {
+    workMin = Math.max(5, Math.min(90, workMin + delta));
+    document.getElementById('workVal').textContent = workMin;
+  } else {
+    breakMin = Math.max(1, Math.min(30, breakMin + delta));
+    document.getElementById('breakVal').textContent = breakMin;
+  }
+  if (!running) initTimer();
+}
+function updateDots() {
+  const wrap = document.getElementById('sessionDots');
+  wrap.innerHTML = '';
+  for (let i = 0; i < maxSessions; i++) {
+    const d = document.createElement('div');
+    d.className = 'session-dot' + (i < sessionCount ? ' done' : '');
+    wrap.appendChild(d);
+  }
+  if (sessionCount >= maxSessions) sessionCount = 0;
+}
+
+// ── Greyscale ──
+function toggleGrey() {
+  greyEnabled = !greyEnabled;
+  document.body.classList.toggle('greyscale', greyEnabled);
+  document.getElementById('greySwitch').classList.toggle('on', greyEnabled);
+}
+
+// ── Notification ──
+function showNotif(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Log storage ──
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function loadLog() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+}
+function saveLog(log) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+}
+function saveSession() {
+  const log = loadLog();
+  const key = todayKey();
+  if (!log[key]) log[key] = { sessions: 0, workMin: 0, memos: [] };
+  log[key].sessions++;
+  log[key].workMin += workMin;
+  saveLog(log);
+}
+function saveMemo() {
+  const text = document.getElementById('memoInput').value.trim();
+  if (!text) return;
+  const log = loadLog();
+  const key = todayKey();
+  if (!log[key]) log[key] = { sessions: 0, workMin: 0, memos: [] };
+  log[key].memos.push({ time: new Date().toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit'}), text });
+  saveLog(log);
+  document.getElementById('memoInput').value = '';
+  showNotif('保存した');
+}
+function clearLog() {
+  if (!confirm('全記録を削除しますか？')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  renderLog();
+}
+
+// ── Render Log ──
+function renderLog() {
+  const log = loadLog();
+  const keys = Object.keys(log).sort().reverse();
+
+  // Week graph (last 7 days)
+  const graphEl = document.getElementById('weekGraph');
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const k = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const label = ['日','月','火','水','木','金','土'][d.getDay()];
+    days.push({ key: k, label, data: log[k] || null });
+  }
+  const maxMin = Math.max(...days.map(d => d.data ? d.data.workMin : 0), 1);
+  graphEl.innerHTML = `
+    <div class="section-header" style="margin-bottom:12px;">過去7日</div>
+    <div class="graph-bars">
+      ${days.map(d => {
+        const min = d.data ? d.data.workMin : 0;
+        const pct = (min / maxMin) * 100;
+        const h = min > 0 ? `${Math.round(min/60*10)/10}h` : '';
+        return `
+          <div class="bar-wrap">
+            <div class="bar-val">${h}</div>
+            <div class="bar-bg">
+              <div class="bar-fill" style="height:${pct}%"></div>
+            </div>
+            <div class="bar-label">${d.label}</div>
+          </div>`;
+      }).join('')}
+    </div>`;
+
+  // Entries
+  const entriesEl = document.getElementById('logEntries');
+  if (!keys.length) {
+    entriesEl.innerHTML = '<div class="log-empty">記録なし</div>';
+    return;
+  }
+  entriesEl.innerHTML = keys.map(k => {
+    const entry = log[k];
+    const h = Math.floor(entry.workMin / 60);
+    const m = entry.workMin % 60;
+    const timeStr = h > 0 ? `${h}h${m}m` : `${m}m`;
+    const dateStr = k.replace(/-/g, '/');
+    const memos = entry.memos || [];
+    return `
+      <div class="log-day">
+        <div class="log-day-header">
+          <div class="log-day-date">${dateStr}</div>
+          <div class="log-day-stats">${entry.sessions} sessions · ${timeStr}</div>
+        </div>
+        ${memos.length ? `
+          <div class="log-memo-list">
+            ${memos.map(m => `<div class="log-memo-item">${m.time} ${m.text}</div>`).join('')}
+          </div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// ── Init ──
+updateDots();
+initTimer();
+</script>
+</body>
+</html>
